@@ -1,4 +1,4 @@
-package EmailNotification.EmailNotification;
+package email.notification;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

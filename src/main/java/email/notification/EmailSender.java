@@ -1,4 +1,4 @@
-package EmailNotification.EmailNotification;
+package email.notification;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -14,70 +14,47 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-class EmailConfiguration{
-	private String path;
-	
-	private static EmailConfiguration configuration;
-	
-	private EmailConfiguration(){
-		path = "config.properties";
-	}
-	
-	public static synchronized EmailConfiguration getInstance(){
-		if(configuration == null){
-			configuration = new EmailConfiguration();
-		}
-		return configuration;
-	}
-	
-	public String getConfigPath(){
-		return path;
-	}
-}
+import email.notification.EmailConfiguration;;
 
-public class EmailSender{
+public class EmailSender {
 	final static String config = EmailConfiguration.getInstance().getConfigPath();
 	private Scanner scanner;
-	
-	public void sender() throws IOException{
+
+	public void sender() throws IOException {
 		InputStream in = new FileInputStream(config);
-		
+
 		scanner = new Scanner(System.in);
-		
+
 		System.out.println("Please enter the destination email address: ");
 		String destination = scanner.nextLine();
-		
+
 		System.out.println("Please enter your subject: ");
 		String subject = scanner.nextLine();
-		
+
 		System.out.println("Please enter your content: ");
 		String content = scanner.nextLine();
-		
+
 		final Properties props = new Properties();
 		props.load(in);
-		
-		Session session = Session.getInstance(props, new javax.mail.Authenticator(){
-			protected PasswordAuthentication getPasswordAuthentication(){
-				return new PasswordAuthentication(props.getProperty("mail.smtp.username"), props.getProperty("mail.smtp.password"));
+
+		Session session = Session.getInstance(props, new javax.mail.Authenticator() {
+			protected PasswordAuthentication getPasswordAuthentication() {
+				return new PasswordAuthentication(props.getProperty("mail.smtp.username"),
+						props.getProperty("mail.smtp.password"));
 			}
 		});
-		
-		try{
+
+		try {
 			Message message = new MimeMessage(session);
 			message.setFrom(new InternetAddress((String) props.get("mail.smtp.username")));
-			message.setRecipients(Message.RecipientType.TO, 
-					InternetAddress.parse(destination));
+			message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(destination));
 			message.setSubject(subject);
 			message.setText(content);
-			
+
 			Transport.send(message);
-		}catch(MessagingException e){
+		} catch (MessagingException e) {
 			throw new RuntimeException(e);
 		}
 	}
-	
-	public static void main(String[] args) throws IOException{
-		EmailSender sender = new EmailSender();
-		sender.sender();
-	}
+
 }
