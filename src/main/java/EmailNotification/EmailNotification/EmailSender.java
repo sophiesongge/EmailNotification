@@ -14,13 +14,35 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-public class EmailSender{
-	final static String config = "config.properties";
+class EmailConfiguration{
+	private String path;
 	
-	public static void sender() throws IOException{
+	private static EmailConfiguration configuration;
+	
+	private EmailConfiguration(){
+		path = "config.properties";
+	}
+	
+	public static synchronized EmailConfiguration getInstance(){
+		if(configuration == null){
+			configuration = new EmailConfiguration();
+		}
+		return configuration;
+	}
+	
+	public String getConfigPath(){
+		return path;
+	}
+}
+
+public class EmailSender{
+	final static String config = EmailConfiguration.getInstance().getConfigPath();
+	private Scanner scanner;
+	
+	public void sender() throws IOException{
 		InputStream in = new FileInputStream(config);
 		
-		Scanner scanner = new Scanner(System.in);
+		scanner = new Scanner(System.in);
 		
 		System.out.println("Please enter the destination email address: ");
 		String destination = scanner.nextLine();
@@ -55,6 +77,7 @@ public class EmailSender{
 	}
 	
 	public static void main(String[] args) throws IOException{
-		sender();
+		EmailSender sender = new EmailSender();
+		sender.sender();
 	}
 }
