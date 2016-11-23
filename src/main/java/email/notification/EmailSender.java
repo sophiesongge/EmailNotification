@@ -1,8 +1,5 @@
 package email.notification;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Properties;
 import java.util.Scanner;
 
@@ -11,6 +8,7 @@ import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
+import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
@@ -20,8 +18,7 @@ public class EmailSender {
 	final static String config = EmailConfiguration.getInstance().getConfigPath();
 	private Scanner scanner;
 
-	public void sender() throws IOException {
-		InputStream in = new FileInputStream(config);
+	public void sender() throws RuntimeException {
 
 		scanner = new Scanner(System.in);
 
@@ -34,8 +31,7 @@ public class EmailSender {
 		System.out.println("Please enter your content: ");
 		String content = scanner.nextLine();
 
-		final Properties props = new Properties();
-		props.load(in);
+		final Properties props = EmailConfiguration.getInstance().getConfigProperties();
 
 		Session session = Session.getInstance(props, new javax.mail.Authenticator() {
 			protected PasswordAuthentication getPasswordAuthentication() {
@@ -52,8 +48,10 @@ public class EmailSender {
 			message.setText(content);
 
 			Transport.send(message);
+		} catch (AddressException e) {
+			throw new RuntimeException("Malformed email address: ", e);
 		} catch (MessagingException e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException("Error Sending Email");
 		}
 	}
 
