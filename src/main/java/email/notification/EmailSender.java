@@ -51,7 +51,7 @@ public class EmailSender {
 		} catch (AddressException e) {
 			throw new RuntimeException("Malformed email address: ", e);
 		} catch (MessagingException e) {
-			throw new RuntimeException("Error Sending Email");
+			throw new RuntimeException("Error Sending Email", e);
 		}
 	}
 
